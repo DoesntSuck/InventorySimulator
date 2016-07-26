@@ -19,6 +19,30 @@ namespace InventorySimulator
             Triangles = new List<GraphTriangle>();
         }
 
+        public override void RemoveNode(GraphNode toBeDeleted)
+        {
+            base.RemoveNode(toBeDeleted);
+
+            // Check for triangles that contain the given node
+            for (int i = 0; i < Triangles.Count; i++)
+            {
+                // If a triangle contains the given node, remove the triangle
+                if (Triangles[i].Contains(toBeDeleted))
+                    Triangles.RemoveAt(i);
+            }
+
+            // Also remove triangle from edge-tri dict
+            foreach (List<GraphTriangle> edgeTris in edgeTriangles.Values)
+            {
+                for (int i = 0; i < edgeTris.Count; i++)
+                {
+                    // If a triangle contains the given node, remove the triangle
+                    if (edgeTris[i].Contains(toBeDeleted))
+                        edgeTris.RemoveAt(i);
+                }
+            }
+        }
+
         /// <summary>
         /// Creates and adds a new edge between the given nodes; also stores any new triangles created with the addition of the new edge. Returns the
         /// newly created edge
