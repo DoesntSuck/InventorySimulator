@@ -10,22 +10,40 @@ namespace InventorySimulator
     /// </summary>
     public class GraphTriangle
     {
+        // Nodes
         public GraphNode a { get; private set; }
         public GraphNode b { get; private set; }
         public GraphNode c { get; private set; }
 
+        // Edges
         public GraphEdge AB { get; private set; }
         public GraphEdge AC { get; private set; }
         public GraphEdge BC { get; private set; }
 
+        /// <summary>
+        /// The circumsphere that encloses each of the vectors associated with this triangle's nodes
+        /// </summary>
+        public Sphere Circumsphere
+        {
+            get
+            {
+                // Lazy initialization of circumsphere
+                if (circumsphere == null)
+                    circumsphere = Sphere.Circumsphere(a.Vector, b.Vector, c.Vector);
+
+                return circumsphere;
+            }
+        }
         private Sphere circumsphere;
 
         public GraphTriangle(GraphNode a, GraphNode b, GraphNode c)
         {
+            // Store nodes
             this.a = a;
             this.b = b;
             this.c = c;
 
+            // Get and store edges
             AB = a.GetEdge(b);
             AC = a.GetEdge(c);
             BC = b.GetEdge(c);
@@ -45,12 +63,8 @@ namespace InventorySimulator
         /// <returns>True if the point is inside this triangles circumsphere</returns>
         public bool InsideCircumsphere(Vector3 point)
         {
-            // Lazy initialization of circumsphere
-            if (circumsphere == null)
-                circumsphere = Sphere.Circumsphere(a.Vector, b.Vector, c.Vector);
-
             // Check for inclusion
-            return circumsphere.Contains(point);
+            return Circumsphere.Contains(point);
         }
 
         /// <summary>
@@ -86,7 +100,7 @@ namespace InventorySimulator
         /// <summary>
         /// Iterate through the edges that make up this triangle
         /// </summary>
-        public IEnumerable GetEdges()
+        public IEnumerable<GraphEdge> GetEdges()
         {
             yield return AB;
             yield return AC;

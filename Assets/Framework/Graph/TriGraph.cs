@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 
 namespace InventorySimulator
 {
     public class TriGraph : Graph
     {
+        /// <summary>
+        /// Collection of triangles formed by the addition of edges to this graph
+        /// </summary>
         public List<GraphTriangle> Triangles { get; private set; }
 
-        private Dictionary<GraphEdge, List<GraphTriangle>> edgeTriangles;
+        private Dictionary<GraphEdge, List<GraphTriangle>> edgeTriangles;   // Triangles indexed by edge
 
         public TriGraph()
         {
@@ -41,31 +42,33 @@ namespace InventorySimulator
         }
 
         /// <summary>
-        /// Removes the edge from all collections
+        /// Removes the edge from this graph. Any triangles associated with the edge will also be removed
         /// </summary>
         public override void RemoveEdge(GraphEdge edge)
         {
             base.RemoveEdge(edge);
 
+            // Remove all triangles associated with the given edge
+            foreach (GraphTriangle triangle in edgeTriangles[edge])
+                Triangles.Remove(triangle);
+
+            // Remove edge key from edge-tri dict
             edgeTriangles.Remove(edge);
         }
 
-        /// <summary>
-        /// Does nothing... yet.
-        /// </summary>
-        /// <param name="node"></param>
         public override void RemoveNode(GraphNode node)
         {
-            base.RemoveNode(node);
-
-            // Feels bad man
-            throw new NotImplementedException("Please don't remove nodes");
+            throw new NotImplementedException("Please don't remove nodes"); // Feels bad man
         }
 
+        /// <summary>
+        /// Creates and stores a triangle that is associated with the given three nodes
+        /// </summary>
         private void AddTriangle(GraphNode x, GraphNode y, GraphNode z)
         {
             GraphTriangle triangle = new GraphTriangle(x, y, z);
 
+            // Add to triangle list and edge-indexed triangle dict
             Triangles.Add(triangle);
             edgeTriangles[triangle.AB].Add(triangle);
             edgeTriangles[triangle.AC].Add(triangle);
@@ -88,19 +91,25 @@ namespace InventorySimulator
             edgeTriangles[toRemove.BC].Remove(toRemove);
 
             // Check if edges of 'toRemove' are in use by any other triangle; if not, remove the edge
-            if (edgeTriangles[toRemove.AB].Count == 0) RemoveEdge(toRemove.AB);
-            if (edgeTriangles[toRemove.AC].Count == 0) RemoveEdge(toRemove.AC);
-            if (edgeTriangles[toRemove.BC].Count == 0) RemoveEdge(toRemove.BC);
+            if (edgeTriangles[toRemove.AB].Count == 0) edgeTriangles.Remove(toRemove.AB);
+            if (edgeTriangles[toRemove.AC].Count == 0) edgeTriangles.Remove(toRemove.AC);
+            if (edgeTriangles[toRemove.BC].Count == 0) edgeTriangles.Remove(toRemove.BC);
         }
 
+        /// <summary>
+        /// Checks if this tri-graph contains a triangle connecting the given nodes
+        /// </summary>
         public bool ContainsTriangle(GraphNode a, GraphNode b, GraphNode c)
         {
+            // Iterate through all triangles
             foreach (GraphTriangle triangle in Triangles)
             {
+                // If triangle contains all nodes...
                 if (triangle.Contains(a) && triangle.Contains(b) && triangle.Contains(c))
                     return true;
             }
 
+            // No triangle contained all nodes
             return false;
         }
 

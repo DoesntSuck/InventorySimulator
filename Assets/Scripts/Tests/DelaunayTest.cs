@@ -5,20 +5,20 @@ using UnityExtension;
 namespace InventorySimulator
 {
     [RequireComponent(typeof(MeshFilter))]
-    [RequireComponent(typeof(Collider))]
     public class DelaunayTest : MonoBehaviour
     {
         // Will be given a complex collider (complex collider has Contains() method)
         // Randomly generate points checking if they are contained within the complex collider
         // Do until have n points -- TODO: do i care if delaunay points are inside collider?
 
-        private new Collider collider;
         private MeshFilter meshFilter;
         private TriGraph graph;
 
+        private GraphTriangle failTri;
+        private Vector3 penetratingPoint;
+
         void Start()
         {
-            collider = GetComponent<Collider>();
             meshFilter = GetComponent<MeshFilter>();
 
             Vector3[] insertionVectors = new Vector3[transform.childCount];
@@ -35,6 +35,27 @@ namespace InventorySimulator
                 foreach (GraphEdge edge in graph.Edges)
                     Gizmos.DrawLine(edge.A.Vector, edge.B.Vector);
             }
+
+            if (failTri != null)
+            {
+                Gizmos.color = Color.red;
+                foreach (GraphEdge edge in failTri.GetEdges())
+                    Gizmos.DrawLine(edge.A.Vector, edge.B.Vector);
+
+                Gizmos.color = Color.green;
+
+                Sphere circumsphere = Sphere.Circumsphere(failTri.a.Vector, failTri.b.Vector, failTri.c.Vector);
+                Gizmos.DrawWireSphere(circumsphere.Centre, circumsphere.Radius);
+
+                Gizmos.DrawSphere(penetratingPoint, 0.05f);
+
+                Gizmos.color = Color.white;
+            }
+
+            //foreach (GraphTriangle triangle in graph.Triangles)
+            //{
+            //    Gizmos.DrawSphere(triangle.Circumsphere.Centre, 0.05f);
+            //}
         }
 
         public void Triangulate(Mesh mesh, Vector3[] insertionVectors)
@@ -46,8 +67,7 @@ namespace InventorySimulator
 
             for (int i = 0; i < insertionVectors.Length; i++)
             {
-                if (collider.bounds.Contains(insertionVectors[i]))
-                    Insert(insertionVectors[i]);
+                Insert(insertionVectors[i]);
             }
 
             print("Delaunay Check: [Mesh + insertion] " + CheckDelaunay());
@@ -111,7 +131,12 @@ namespace InventorySimulator
                     if (!triangle.Contains(node))
                     {
                         if (triangle.InsideCircumsphere(node.Vector))
+                        {
+                            failTri = triangle;
+                            penetratingPoint = node.Vector;
+
                             return false;
+                        }
                     }
                 }
             }

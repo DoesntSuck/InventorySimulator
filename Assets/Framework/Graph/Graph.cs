@@ -1,40 +1,29 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace InventorySimulator
 {
     public class Graph
     {
+        /// <summary>
+        /// Collection of nodes in this graph
+        /// </summary>
         public List<GraphNode> Nodes { get; protected set; }
-        public HashSet<GraphEdge> Edges { get; protected set; }
 
-        // TODO: Store list of edges to allow drawing gizmos easily
+        /// <summary>
+        /// Collection of edges in this graph
+        /// </summary>
+        public HashSet<GraphEdge> Edges { get; protected set; } // Collection is a set to quicken 'Remove' operations
 
         public Graph()
         {
             Nodes = new List<GraphNode>();
             Edges = new HashSet<GraphEdge>();
         }
-
+        
         /// <summary>
-        /// Checks if there is an edge from node x to node y
+        /// Gets the closest nodes to the given vector. Nodes are sort baed on distance to the given vector
         /// </summary>
-        public bool Adjacent(GraphNode x, GraphNode y)
-        {
-            return x.ConnectsTo(y);
-        }
-
-        /// <summary>
-        /// Iterates through all nodes connected by an edge to x
-        /// </summary>
-        public IEnumerable Neighbours(GraphNode x)
-        {
-            return x.ConnectedNodes();
-        }
-
         public List<GraphNode> Closest(Vector3 point, int count)
         {
             // Sort Nodes list based on each nodes' vector's distance to the given point
@@ -42,9 +31,6 @@ namespace InventorySimulator
 
             // Return subset of elements starting at first element and containing 'count' number of elements
             return Nodes.GetRange(0, count);
-
-            // SOrt list of nodes based on distance to the given point
-            // Return array containing the first 'count' nodes in list.
         }
 
         /// <summary>
@@ -75,6 +61,7 @@ namespace InventorySimulator
         /// </summary>
         public virtual GraphEdge AddEdge(GraphNode x,GraphNode y)
         {
+            // Create and add edge to set of edges
             GraphEdge edge = new GraphEdge(x, y);
             Edges.Add(edge);
 
@@ -89,13 +76,18 @@ namespace InventorySimulator
         /// </summary>
         public virtual void RemoveEdge(GraphNode x, GraphNode y)
         {
+            // Get edge between x and y, remove from list of edges
             GraphEdge edge = x.GetEdge(y);
             Edges.Remove(edge);
 
+            // Both nodes in edge remove the edge from their list of edges
             x.RemoveEdge(y);
             y.RemoveEdge(x);
         }
 
+        /// <summary>
+        /// Removes the given edge from this graph.
+        /// </summary>
         public virtual void RemoveEdge(GraphEdge edge)
         {
             RemoveEdge(edge.A, edge.B);
