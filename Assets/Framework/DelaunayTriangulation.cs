@@ -81,28 +81,31 @@ namespace InventorySimulator
                         }
                     }
                 }
+            }
 
-                //
-                // Remove inside edges from guilty triangles, leaving a hole in the triangulation
-                //
+            //
+            // Remove inside edges from guilty triangles, leaving a hole in the triangulation
+            //
 
-                // Remove all inside edges from graph
-                foreach (GraphEdge insideEdge in insideEdges)
-                    graph.RemoveEdge(insideEdge);
+            // Remove all inside edges from graph
+            foreach (GraphEdge insideEdge in insideEdges)
+                graph.RemoveEdge(insideEdge);
 
-                // Add vector to graph
-                GraphNode node = graph.AddNode(vector);
+            //
+            // Add given vector to graph
+            //
 
-                //
-                // Triangulate the hole: created triangles are guaranteed to be Delaunay
-                //
+            GraphNode node = graph.AddNode(vector);
 
-                // Add edge between every node in a guilty triangle to the newly inserted node
-                foreach (GraphTriangle guiltyTriangle in guiltyTriangles)
-                {
-                    foreach (GraphNode guiltyNode in guiltyTriangle.GetNodes())
-                        graph.AddEdge(node, guiltyNode);
-                }
+            //
+            // Triangulate the hole: created triangles are guaranteed to be Delaunay
+            //
+
+            // Add edge between every node in a guilty triangle to the newly inserted node
+            foreach (GraphTriangle guiltyTriangle in guiltyTriangles)
+            {
+                foreach (GraphNode guiltyNode in guiltyTriangle.GetNodes())
+                    graph.AddEdge(node, guiltyNode);
             }
         }
 
