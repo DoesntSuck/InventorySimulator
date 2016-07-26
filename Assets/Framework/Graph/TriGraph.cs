@@ -56,11 +56,6 @@ namespace InventorySimulator
             edgeTriangles.Remove(edge);
         }
 
-        public override void RemoveNode(GraphNode node)
-        {
-            throw new NotImplementedException("Please don't remove nodes"); // Feels bad man
-        }
-
         /// <summary>
         /// Creates and stores a triangle that is associated with the given three nodes
         /// </summary>
