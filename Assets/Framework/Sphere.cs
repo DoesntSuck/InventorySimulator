@@ -43,6 +43,13 @@ namespace InventorySimulator
             return new Sphere(circumcentre, circumradius);
         }
 
+        public static Sphere Circumsphere(GraphNode[] nodes)
+        {
+            if (nodes.Length == 4) return Circumsphere(nodes[0].Vector, nodes[1].Vector, nodes[2].Vector, nodes[3].Vector);
+            else if (nodes.Length == 3) return Circumsphere(nodes[0].Vector, nodes[1].Vector, nodes[2].Vector);
+            else throw new NotImplementedException("Can only calculate circumsphere of triangle or tetrahedron");
+        }
+
         /// <summary>
         /// Checks if the given point is contained within this sphere
         /// </summary>

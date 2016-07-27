@@ -115,6 +115,11 @@ namespace InventorySimulator
             if (edgeTriangles[toRemove.BC].Count == 0) edgeTriangles.Remove(toRemove.BC);
         }
 
+        //public List<GraphTriangle> GetTriangle(GraphNode a, GraphNode b, GraphNode c)
+        //{
+        //    //return edgeTriangles[edge];
+        //}
+
         /// <summary>
         /// Checks if this tri-graph contains a triangle connecting the given nodes
         /// </summary>
