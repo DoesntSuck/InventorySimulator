@@ -36,6 +36,16 @@ namespace Framework.TetraGraph
         }
 
         /// <summary>
+        /// Checks if this face and the given face have two nodes in common
+        /// </summary>
+        public bool SharesEdge(GraphFace other)
+        {
+            return Contains(other.Nodes[0], other.Nodes[1]) ||
+                   Contains(other.Nodes[0], other.Nodes[2]) ||
+                   Contains(other.Nodes[1], other.Nodes[2]);
+        }
+
+        /// <summary>
         /// Gets the third node in this faces set of nodes that is unique from the two given nodes
         /// </summary>
         public GraphNode GetOther(GraphNode node1, GraphNode node2)

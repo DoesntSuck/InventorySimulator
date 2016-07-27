@@ -1,7 +1,6 @@
 ﻿using System;
 using UnityEngine;
 using UnityExtension;
-using Framework.Graph;
 
 namespace Framework
 {
@@ -10,7 +9,14 @@ namespace Framework
     /// </summary>
     public class Sphere
     {
+        /// <summary>
+        /// The centre of this sphere
+        /// </summary>
         public Vector3 Centre { get; set; }
+
+        /// <summary>
+        /// The radius of this sphere
+        /// </summary>
         public float Radius { get; set; }
 
         public Sphere(Vector3 centre, float radius)
@@ -36,19 +42,18 @@ namespace Framework
             return new Sphere(circumcentre, circumradius);
         }
 
+        /// <summary>
+        /// Circumsphere of a tetrahedron.
+        /// </summary>
         public static Sphere Circumsphere(Vector3 a, Vector3 b, Vector3 c, Vector3 d)
         {
+            // Centre
             Vector3 circumcentre = Math3D.Circumcentre(a, b, c, d);
+
+            // Radius
             float circumradius = Vector3.Distance(circumcentre, a);
 
             return new Sphere(circumcentre, circumradius);
-        }
-
-        public static Sphere Circumsphere(GraphNode[] nodes)
-        {
-            if (nodes.Length == 4) return Circumsphere(nodes[0].Vector, nodes[1].Vector, nodes[2].Vector, nodes[3].Vector);
-            else if (nodes.Length == 3) return Circumsphere(nodes[0].Vector, nodes[1].Vector, nodes[2].Vector);
-            else throw new NotImplementedException("Can only calculate circumsphere of triangle or tetrahedron");
         }
 
         /// <summary>
