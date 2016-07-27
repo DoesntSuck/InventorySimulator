@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace InventorySimulator
+namespace Framework.Graph
 {
     public class TriGraph : Graph
     {

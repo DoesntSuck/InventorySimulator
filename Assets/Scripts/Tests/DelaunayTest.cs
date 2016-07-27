@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using UnityExtension;
+using Framework;
+using Framework.Graph;
 
 namespace InventorySimulator
 {

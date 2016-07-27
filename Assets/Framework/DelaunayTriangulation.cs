@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityExtension;
+using Framework.Graph;
 
-namespace InventorySimulator
+namespace Framework
 {
     // TODO: Don't connect original mesh vectors to delaunay triangulation: these vectors are part of the voronoi dual graph NOT the delaunay triangulation
 

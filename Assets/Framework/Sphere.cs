@@ -1,8 +1,9 @@
 ﻿using System;
 using UnityEngine;
 using UnityExtension;
+using Framework.Graph;
 
-namespace InventorySimulator
+namespace Framework
 {
     /// <summary>
     /// A sphere composed of a central vertex in 3-dimensional space and a radius

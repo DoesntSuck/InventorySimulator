@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace InventorySimulator
+namespace Framework.Graph
 {
     /// <summary>
     /// A triangle composed of three vertices and edges in 3-dimensional space
