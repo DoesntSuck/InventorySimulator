@@ -35,6 +35,14 @@ namespace InventorySimulator
             return new Sphere(circumcentre, circumradius);
         }
 
+        public static Sphere Circumsphere(Vector3 a, Vector3 b, Vector3 c, Vector3 d)
+        {
+            Vector3 circumcentre = Math3D.Circumcentre(a, b, c, d);
+            float circumradius = Vector3.Distance(circumcentre, a);
+
+            return new Sphere(circumcentre, circumradius);
+        }
+
         /// <summary>
         /// Checks if the given point is contained within this sphere
         /// </summary>

@@ -13,12 +13,24 @@ namespace InventorySimulator
     {
         public static Vector3 superTriangleExtents = new Vector3(100, 100, 100);
 
+        public TriGraph Graph { get { return graph; } }
         private TriGraph graph;
+
         private GraphNode[] superTriangleNodes;
 
         public DelaunayTriangulation()
         {
             graph = new TriGraph();
+        }
+
+        /// <summary>
+        /// Incremental insertion of vectors to a Delaunay triangulation according to the Bowyer-Watson algorithm.
+        /// </summary>
+        public void Insert(Vector3[] insertionVectors)
+        {
+            //
+            // Add super triangle large enough to encorporate every vector in input set
+            //
 
             superTriangleNodes = new GraphNode[4];
 
@@ -32,11 +44,24 @@ namespace InventorySimulator
             // Add edges between nodes
             for (int i = 0; i < superTriangleNodes.Length - 1; i++)
             {
-                for (int j = i; j < superTriangleNodes.Length; j++)
+                for (int j = i + 1; j < superTriangleNodes.Length; j++)
                 {
                     graph.AddEdge(superTriangleNodes[i], superTriangleNodes[j]);
                 }
             }
+
+            //
+            // Add vectors to triangulation
+            //
+
+            foreach (Vector3 insertionVector in insertionVectors)
+                Insert(insertionVector);
+            //
+            // Remove super triangle
+            //
+
+            foreach (GraphNode superTriangleNode in superTriangleNodes)
+                graph.RemoveNode(superTriangleNode);
         }
 
         /// <summary>
@@ -108,43 +133,5 @@ namespace InventorySimulator
                     graph.AddEdge(node, guiltyNode);
             }
         }
-
-        // TODO: Find triangle large enough to encorporate ALL insertion vectors
-        public void Insert(Vector3[] insertionVectors)
-        {
-            // Add vectors to triangulation
-            foreach (Vector3 insertionVector in insertionVectors)
-                Insert(insertionVector);
-
-            // Remove super triangle
-            foreach (GraphNode superTriangleNode in superTriangleNodes)
-                graph.RemoveNode(superTriangleNode);
-        }
-
-        //private List<GraphNode> RemoveTriangles(TriGraph graph, List<GraphTriangle> triangles)
-        //{
-        //    List<GraphNode> affectedNodes = new List<GraphNode>();
-        //    while (triangles.Count > 0)
-        //    {
-        //        // Get and remove first triangle from list
-        //        GraphTriangle triangle = triangles.PopAt(0);
-
-        //        // Remember its nodes, remove the triangle from the graph
-        //        affectedNodes.AddRange(triangle.GetNodes());
-        //        graph.RemoveTriangle(triangle);
-        //    }
-
-        //    return affectedNodes;
-        //}
-
-        //private void TriangulateHole(TriGraph graph, Vector3 point, List<GraphNode> affectedNodes)
-        //{
-        //    // Convert point to a node
-        //    GraphNode node = graph.AddNode(point);
-
-        //    // Connect each affected node to the new node
-        //    foreach (GraphNode affectedNode in affectedNodes)
-        //        graph.AddEdge(node, affectedNode);
-        //}
     }
 }

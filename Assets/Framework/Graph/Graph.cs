@@ -49,8 +49,8 @@ namespace InventorySimulator
         public virtual void RemoveNode(GraphNode toBeDeleted)
         {
             // Remove all edges connecting to the 'toBeDeleted' node
-            foreach (GraphEdge edge in toBeDeleted.Edges)
-                RemoveEdge(edge);
+            while (toBeDeleted.Edges.Count > 0)
+                RemoveEdge(toBeDeleted.Edges[0]);
 
             // Remove node
             Nodes.Remove(toBeDeleted);

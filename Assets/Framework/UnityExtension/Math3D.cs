@@ -40,6 +40,38 @@ namespace UnityExtension
                 return max - Mathf.Sqrt((1 - unifrom) * (max - min) * (max - mid));
         }
 
+        public static Vector3 Circumcentre(Vector3 a, Vector3 b, Vector3 c, Vector3 d)
+        {
+            // Edge vectors are also the normals of perpendicular planes because the normal of a plane is the vector that is perpendicular to the plane
+            // Plane point is the midpoint for the edge
+
+            // Calculate plane for edge AB
+            Vector3 planeABNormal = b - a;                      
+            Vector3 planeABPoint = Vector3.Lerp(a, b, 0.5f);
+
+            // Calculate plane for edge AC
+            Vector3 planeACNormal = c - a;
+            Vector3 planeACPoint = Vector3.Lerp(a, c, 0.5f);
+
+            // Calculate plane for edge CD
+            Vector3 planeCDNormal = d - c;
+            Vector3 planeCDPoint = Vector3.Lerp(c, d, 0.5f);
+
+            // Calculate line that is the plane-plane intersection between AB and AC
+            Vector3 linePoint;
+            Vector3 lineDirection;
+
+            PlanePlaneIntersection(out linePoint, out lineDirection, planeABNormal, planeABPoint, planeACNormal, planeACPoint);
+
+            // Calculate the point that is the plane-line intersection between the above line and CD
+            Vector3 intersection;
+
+            LinePlaneIntersection(out intersection, linePoint, lineDirection, planeCDNormal, planeCDPoint);
+
+            return intersection;
+        }
+
+
 
         /* http://mathforum.org/kb/message.jspa?messageID=4602531
         Assuming the points aren't collinear, they detemine plane. I presume
@@ -184,6 +216,89 @@ namespace UnityExtension
                 return true;
             }
 
+            else
+            {
+                return false;
+            }
+        }
+
+
+
+
+        // TODO: Plane requires point and normal. Point is midpoint of edge, normal is the vector from edge point a to edge point b.
+
+
+
+        //Find the line of intersection between two planes.	The planes are defined by a normal and a point on that plane.
+        //The outputs are a point on the line and a vector which indicates it's direction. If the planes are not parallel, 
+        //the function outputs true, otherwise false.
+        public static bool PlanePlaneIntersection(out Vector3 linePoint, out Vector3 lineVec, Vector3 plane1Normal, Vector3 plane1Position, Vector3 plane2Normal, Vector3 plane2Position)
+        {
+
+            linePoint = Vector3.zero;
+            lineVec = Vector3.zero;
+
+            //We can get the direction of the line of intersection of the two planes by calculating the 
+            //cross product of the normals of the two planes. Note that this is just a direction and the line
+            //is not fixed in space yet. We need a point for that to go with the line vector.
+            lineVec = Vector3.Cross(plane1Normal, plane2Normal);
+
+            //Next is to calculate a point on the line to fix it's position in space. This is done by finding a vector from
+            //the plane2 location, moving parallel to it's plane, and intersecting plane1. To prevent rounding
+            //errors, this vector also has to be perpendicular to lineDirection. To get this vector, calculate
+            //the cross product of the normal of plane2 and the lineDirection.		
+            Vector3 ldir = Vector3.Cross(plane2Normal, lineVec);
+
+            float denominator = Vector3.Dot(plane1Normal, ldir);
+
+            //Prevent divide by zero and rounding errors by requiring about 5 degrees angle between the planes.
+            if (Mathf.Abs(denominator) > 0.006f)
+            {
+
+                Vector3 plane1ToPlane2 = plane1Position - plane2Position;
+                float t = Vector3.Dot(plane1Normal, plane1ToPlane2) / denominator;
+                linePoint = plane2Position + t * ldir;
+
+                return true;
+            }
+
+            //output not valid
+            else
+            {
+                return false;
+            }
+        }
+
+        //Get the intersection between a line and a plane. 
+        //If the line and plane are not parallel, the function outputs true, otherwise false.
+        public static bool LinePlaneIntersection(out Vector3 intersection, Vector3 linePoint, Vector3 lineVec, Vector3 planeNormal, Vector3 planePoint)
+        {
+
+            float length;
+            float dotNumerator;
+            float dotDenominator;
+            Vector3 vector;
+            intersection = Vector3.zero;
+
+            //calculate the distance between the linePoint and the line-plane intersection point
+            dotNumerator = Vector3.Dot((planePoint - linePoint), planeNormal);
+            dotDenominator = Vector3.Dot(lineVec, planeNormal);
+
+            //line and plane are not parallel
+            if (dotDenominator != 0.0f)
+            {
+                length = dotNumerator / dotDenominator;
+
+                //create a vector from the linePoint to the intersection point
+                vector = lineVec.normalized * length;
+
+                //get the coordinates of the line-plane intersection point
+                intersection = linePoint + vector;
+
+                return true;
+            }
+
+            //output not valid
             else
             {
                 return false;
