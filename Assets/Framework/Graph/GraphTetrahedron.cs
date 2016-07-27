@@ -8,12 +8,13 @@ namespace InventorySimulator
 {
     public class GraphTetrahedron
     {
-        public GraphNode a { get { return nodes[0]; } }
-        public GraphNode b { get { return nodes[1]; } }
-        public GraphNode c { get { return nodes[2]; } }
-        public GraphNode d { get { return nodes[3]; } }
-
+        public GraphNode[] Nodes { get { return nodes; } }
         private GraphNode[] nodes;
+
+        public GraphEdge[] Edges { get { return edges; } }
+        private GraphEdge[] edges;
+
+        public GraphTriangle[] Triangles { get { return triangles;  } }
         private GraphTriangle[] triangles;
 
         public Sphere Circumsphere
@@ -22,16 +23,38 @@ namespace InventorySimulator
             {
                 // Lazy initialization of circumsphere
                 if (circumsphere == null)
-                    circumsphere = Sphere.Circumsphere(a.Vector, b.Vector, c.Vector, d.Vector);
+                    circumsphere = Sphere.Circumsphere(nodes[0].Vector, nodes[1].Vector, nodes[2].Vector, nodes[3].Vector);
 
                 return circumsphere;
             }
         }
         private Sphere circumsphere;
 
-        public GraphTetrahedron(GraphNode a, GraphNode b, GraphNode c, GraphNode d)
+        public GraphTetrahedron(GraphTriangle a, GraphTriangle b, GraphTriangle c, GraphTriangle d)
         {
-            nodes = new GraphNode[] { a, b, c, d };
+            triangles = new GraphTriangle[] { a, b, c, d };
+            edges = new GraphEdge[6];
+            nodes = new GraphNode[4];
+
+            // Add each unique edge and node to collections
+            int edgeIndex = 0;
+            int nodeIndex = 0;
+            foreach (GraphTriangle triangle in triangles)
+            {
+                foreach (GraphEdge edge in triangle.GetEdges())
+                {
+                    // If not already in collection, add to collection
+                    if (!edges.Contains(edge))
+                        edges[edgeIndex++] = edge;      // Index is incremented AFTER edge is added to collection
+                }
+
+                foreach (GraphNode node in triangle.GetNodes())
+                {
+                    // If not already in collection, add to collection
+                    if (!nodes.Contains(node))
+                        nodes[nodeIndex++] = node;
+                }
+            }
         }
 
         public bool InsideCircumsphere(Vector3 point)
@@ -51,45 +74,25 @@ namespace InventorySimulator
 
         public bool Contains(GraphTriangle triangle)
         {
-            return Contains(triangle.a) &&
-                   Contains(triangle.b) &&
-                   Contains(triangle.c);
+            return triangles.Contains(triangle);
         }
 
-        public IEnumerable<GraphNode> GetNodes()
+        public bool SharesEdge(GraphTetrahedron other)
         {
-            return nodes.AsEnumerable();
-        }
-
-        public IEnumerable<GraphEdge> GetEdges()
-        {
-            for (int i = 0; i < nodes.Length - 1; i++)
+            int sharedNodes = 0;
+            foreach (GraphNode node in nodes)
             {
-                for (int j = i + 1; j < nodes.Length; j++)
-                {
-                    yield return nodes[i].GetEdge(nodes[j]);
-                }
+                if (other.Contains(node))
+                    sharedNodes++;
             }
-        }
 
-        public IEnumerable<GraphTriangle> GetTriangles(TriGraph graph)
-        {
-            for (int i = 0; i < nodes.Length - 2; i++)
-            {
-                for (int j = i + 1; j < nodes.Length - 1; j++)
-                {
-                    for (int k = j + 1; k < nodes.Length; k++)
-                    {
-                        yield return new GraphTriangle(nodes[i], nodes[j], nodes[k]);
-                    }
-                }
-            }
+            return sharedNodes == 2;
         }
 
         public bool Equals(GraphTetrahedron other)  
         {
             // Check each node for inclusion in other tetrahedron's nodes
-            foreach (GraphNode node in GetNodes())
+            foreach (GraphNode node in nodes)
             {
                 // If other doesn't contain any one of these nodes then the tetrahedrons are not equal
                 if (!other.Contains(node))

@@ -108,6 +108,17 @@ namespace InventorySimulator
 
         }
 
+        public bool SharesEdge(GraphTriangle other)
+        {
+            foreach (GraphEdge edge in GetEdges())
+            {
+                if (other.Contains(edge))
+                    return true;
+            }
+
+            return false;
+        }
+
         /// <summary>
         /// Checks if the given triangle contains the same nodes as this triangle
         /// </summary>
