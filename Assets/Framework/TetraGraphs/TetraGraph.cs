@@ -74,9 +74,12 @@ namespace Framework.TetraGraphs
             GraphFace newFace = new GraphFace(node1, node2, node3);
 
             // Check if the new face can form a tetrahedron with three other connected faces
-            GraphTetrahedron tetra = CreateTetrahedron(newFace);
-            if (tetra != null)
-                Tetrahedrons.Add(tetra);
+            for (int i = 0; i < 2; i++)
+            {
+                GraphTetrahedron tetra = CreateTetrahedron(newFace);
+                if (tetra != null)
+                    Tetrahedrons.Add(tetra);
+            }
 
             // Also add face to each node it is attached to
             node1.AddFace(newFace);
