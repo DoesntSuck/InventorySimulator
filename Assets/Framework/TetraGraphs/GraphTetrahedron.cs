@@ -69,6 +69,17 @@ namespace Framework.TetraGraphs
             return Nodes.Contains(node);
         }
 
+        public bool Contains(ICollection<GraphNode> nodes)
+        {
+            foreach (GraphNode node in nodes)
+            {
+                if (!Nodes.Contains(node))
+                    return false;
+            }
+
+            return true;
+        }
+
         /// <summary>
         /// Checks if this tetrahedron contains the given face
         /// </summary>

@@ -41,13 +41,13 @@ public class DelaunayTetrahedralizationTest : MonoBehaviour
     {
         if (tetrahedralization != null)
         {
-            foreach (GraphFace face in tetrahedralization.Graph.Faces)
+            foreach (GraphTetrahedron tetra in tetrahedralization.Graph.Tetrahedrons)
             {
-                for (int i = 0; i < face.Nodes.Length - 1; i++)
+                for (int i = 0; i < tetra.Nodes.Length - 1; i++)
                 {
-                    for (int j = i + 1; j < face.Nodes.Length; j++)
+                    for (int j = i + 1; j < tetra.Nodes.Length; j++)
                     {
-                        Gizmos.DrawLine(face.Nodes[i].Vector, face.Nodes[j].Vector);
+                        Gizmos.DrawLine(tetra.Nodes[i].Vector, tetra.Nodes[j].Vector);
                     }
                 }
             }

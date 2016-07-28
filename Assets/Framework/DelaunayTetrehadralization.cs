@@ -109,6 +109,8 @@ namespace Framework
                 //
                 foreach (GraphTetrahedron tetra in guiltyTetras)
                     Graph.RemoveTetraherdron(tetra);
+
+                int TESTING_POTATO_TOMATO = 0;
             }
 
             //

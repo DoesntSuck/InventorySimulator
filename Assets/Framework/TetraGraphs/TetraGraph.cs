@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityExtension;
 
 namespace Framework.TetraGraphs
 {
@@ -102,9 +103,12 @@ namespace Framework.TetraGraphs
             {
                 for (int j = i + 1; j < face.Nodes.Length; j++)
                 {
-                    // Create new face
-                    GraphFace newFace = AddFace(face.Nodes[i], face.Nodes[j], node);
-                    faces[index++] = newFace;   // Index is incremented AFTER adding face to array
+                    // Only make a new face if there isn't already one connecting these nodes
+                    if (!ContainsFace(face.Nodes[i], face.Nodes[j], node))
+                    {
+                        GraphFace newFace = AddFace(face.Nodes[i], face.Nodes[j], node);
+                        faces[index++] = newFace;   // Index is incremented AFTER adding face to array
+                    }
                 }
             }
 
@@ -163,6 +167,17 @@ namespace Framework.TetraGraphs
             return false;
         }
 
+        public bool ContainsTetra(ICollection<GraphNode> nodes)
+        {
+            foreach (GraphTetrahedron tetra in Tetrahedrons)
+            {
+                if (tetra.Contains(nodes))
+                    return true;
+            }
+
+            return false;
+        }
+
         /// <summary>
         /// Finds and removes the given tetrahedron from this graph
         /// </summary>
@@ -171,6 +186,8 @@ namespace Framework.TetraGraphs
             Tetrahedrons.Remove(tetrahedron);
         }
 
+        // TODO: Inserting a face can create many tetrahdra
+        
         /// <summary>
         /// Checks if a tetrahedron has been formed with the addition of the given edge. If so, the tetrahedron is created and returned.
         /// </summary>
@@ -190,20 +207,29 @@ namespace Framework.TetraGraphs
                     HashSet<GraphNode> tetraNodes = new HashSet<GraphNode>(newFace.Nodes);
                     tetraNodes.UnionWith(face.Nodes);
 
-                    // Create list to store faces of tetra, list starts with the current face
-                    List<GraphFace> tetraFaces = new List<GraphFace>() { face };
-                    foreach (GraphFace otherFace in Faces)
+                    // Check that there is not already a tetra made from the given nodes
+                    if (!ContainsTetra(tetraNodes))
                     {
-                        // Checks that there aren't nodes in otherFace that tetra nodes doesn't contain
-                        if (!otherFace.Nodes.Except(tetraNodes).Any())
+                        // Create list to store faces of tetra, list starts with the current face
+                        HashSet<GraphFace> tetraFacesSet = new HashSet<GraphFace>() { face };
+                        foreach (GraphFace otherFace in Faces)
                         {
-                            tetraFaces.Add(otherFace);
-
-                            // Found enough connecting faces to make a tetrahedron
-                            if (tetraFaces.Count == 3)
+                            // Check that otherFace contains no unique nodes
+                            if (tetraNodes.ContainsAll(otherFace.Nodes))
                             {
-                                GraphTetrahedron tetra = new GraphTetrahedron(newFace, tetraFaces[0], tetraFaces[1], tetraFaces[2]);
-                                return tetra;
+                                tetraFacesSet.Add(otherFace);
+
+                                // Found enough connecting faces to make a tetrahedron
+                                if (tetraFacesSet.Count == 3)
+                                {
+                                    // Convert to array so can access specific elements
+                                    GraphFace[] tetraFaces = tetraFacesSet.ToArray();
+
+                                    GraphTetrahedron tetra = new GraphTetrahedron(newFace, tetraFaces[0], tetraFaces[1], tetraFaces[2]);
+
+                                    // TODO: dont stop here!
+                                    return tetra;
+                                }
                             }
                         }
                     }
