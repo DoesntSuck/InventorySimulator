@@ -105,8 +105,10 @@ namespace Framework
                 }
 
                 //
-                // TODO: Remove guilty tetrahedrons from graph
+                // Remove guilty tetrahedrons from graph
                 //
+                foreach (GraphTetrahedron tetra in guiltyTetras)
+                    Graph.RemoveTetraherdron(tetra);
             }
 
             //

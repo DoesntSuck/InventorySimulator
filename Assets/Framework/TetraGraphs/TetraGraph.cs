@@ -164,6 +164,14 @@ namespace Framework.TetraGraphs
         }
 
         /// <summary>
+        /// Finds and removes the given tetrahedron from this graph
+        /// </summary>
+        public void RemoveTetraherdron(GraphTetrahedron tetrahedron)
+        {
+            Tetrahedrons.Remove(tetrahedron);
+        }
+
+        /// <summary>
         /// Checks if a tetrahedron has been formed with the addition of the given edge. If so, the tetrahedron is created and returned.
         /// </summary>
         private GraphTetrahedron CreateTetrahedron(GraphFace newFace)
