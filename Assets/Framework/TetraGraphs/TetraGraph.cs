@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Framework.TetraGraph
+namespace Framework.TetraGraphs
 {
     public class TetraGraph
     {

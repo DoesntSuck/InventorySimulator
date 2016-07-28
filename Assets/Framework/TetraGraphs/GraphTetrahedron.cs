@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace Framework.TetraGraph
+namespace Framework.TetraGraphs
 {
     public class GraphTetrahedron
     {
@@ -58,7 +58,7 @@ namespace Framework.TetraGraph
         /// </summary>
         public bool InsideCircumsphere(Vector3 point)
         {
-            return circumsphere.Contains(point);
+            return Circumsphere.Contains(point);
         }
 
         /// <summary>

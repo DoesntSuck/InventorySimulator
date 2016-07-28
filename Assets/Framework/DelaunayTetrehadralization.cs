@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Framework.TetraGraph;
+using Framework.TetraGraphs;
 
-namespace Assets.Framework
+namespace Framework
 {
-    public class DelaunayTetrehadralization
+    public class DelaunayTetrahedralization
     {
         /// <summary>
         /// The extents of the triangle that contains all inerstion vectors
@@ -20,7 +20,7 @@ namespace Assets.Framework
 
         private GraphNode[] superTetra;
 
-        public DelaunayTetrehadralization()
+        public DelaunayTetrahedralization()
         {
             Graph = new TetraGraph();
 
@@ -103,6 +103,10 @@ namespace Assets.Framework
                         Graph.AddFaces(outsideFace, newNode);
                     }   
                 }
+
+                //
+                // TODO: Remove guilty tetrahedrons from graph
+                //
             }
 
             //

@@ -6,7 +6,7 @@ using Framework.Graph;
 
 namespace InventorySimulator
 {
-    public class DelaunayTest : MonoBehaviour
+    public class DelaunayTriangulationTest : MonoBehaviour
     {
         // Will be given a complex collider (complex collider has Contains() method)
         // Randomly generate points checking if they are contained within the complex collider

@@ -5,7 +5,7 @@ using System.Text;
 using UnityEngine;
 using Framework;
 
-namespace Framework.TetraGraph
+namespace Framework.TetraGraphs
 {
     public class GraphFace
     {

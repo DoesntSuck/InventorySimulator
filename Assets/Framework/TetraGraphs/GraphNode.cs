@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace Framework.TetraGraph
+namespace Framework.TetraGraphs
 {
     public class GraphNode
     {
