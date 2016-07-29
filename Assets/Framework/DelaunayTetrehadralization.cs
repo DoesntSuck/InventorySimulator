@@ -11,7 +11,7 @@ namespace Framework
         /// <summary>
         /// The extents of the triangle that contains all inerstion vectors
         /// </summary>
-        public static Vector3 SuperTetraExtents = new Vector3(100, 100, 100);
+        public static Vector3 SuperTetraExtents = new Vector3(10, 10, 10);
 
         /// <summary>
         /// The tetraGraph storing all nodes, faces, and tetrahedrons in this Delaunay-Tetrahedralization
@@ -56,27 +56,18 @@ namespace Framework
                 }
 
                 //
-                // Find inside faces of guilty tetrahedrons
+                // Find inside / ouside faces of guilty tetrahedrons
                 //
 
-                List<GraphFace> insideFaces = new List<GraphFace>();
-                for (int i = 0; i < guiltyTetras.Count - 1; i++)
-                {
-                    // Iterate through each face of each guilty tetra
-                    foreach (GraphFace face in guiltyTetras[i].Faces)
-                    {
-                        for (int j = 0; j < guiltyTetras.Count; j++)
-                        {
-                            // Compare guilty tetra face to other guilty tetra face
-                            if (guiltyTetras[j].Contains(face))
-                            {
-                                // If they share the face, the face is an inside face
-                                insideFaces.Add(face);
-                                break;                          // If face is common to two tetras it is on the inside: no need to keep checking
-                            }
-                        }
-                    }
-                }
+                List<GraphFace> insideFaces;
+                List<GraphFace> outsideFaces;
+                TetraGraph.InsideOutsideFaces(out insideFaces, out outsideFaces, guiltyTetras);
+
+                //
+                // Remove guilty tetrahedrons from graph
+                //
+                foreach (GraphTetrahedron tetra in guiltyTetras)
+                    Graph.RemoveTetraherdron(tetra);
 
                 //
                 // Remove inside faces leaving a hole in the triangulation
@@ -86,29 +77,12 @@ namespace Framework
                     Graph.RemoveFace(insideFace);
 
                 //
-                // Add given vector to graph
+                // Triangulate the hole by connecting outside faces to new node
                 //
 
                 GraphNode newNode = Graph.AddNode(insertionVector);
-
-                //
-                // Triangulate the hole by connecting guilty tetra outside faces to new node
-                //
-
-                foreach (GraphTetrahedron guiltyTetra in guiltyTetras)
-                {
-                    // Outside faces are those belonging to guilty tetras but not to the insideFaces list
-                    foreach (GraphFace outsideFace in guiltyTetra.Faces.Except(insideFaces))
-                    {
-                        Graph.AddFaces(outsideFace, newNode);
-                    }   
-                }
-
-                //
-                // Remove guilty tetrahedrons from graph
-                //
-                foreach (GraphTetrahedron tetra in guiltyTetras)
-                    Graph.RemoveTetraherdron(tetra);
+                foreach (GraphFace outsideFace in outsideFaces)
+                    Graph.AddFaces(outsideFace, newNode);
 
                 int TESTING_POTATO_TOMATO = 0;
             }
