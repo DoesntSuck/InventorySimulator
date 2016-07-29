@@ -134,5 +134,10 @@ namespace Framework.TetraGraphs
             // No face connects this node to the two given nodes
             return false;
         }
+
+        public override string ToString()
+        {
+            return Vector.ToString();
+        }
     }
 }

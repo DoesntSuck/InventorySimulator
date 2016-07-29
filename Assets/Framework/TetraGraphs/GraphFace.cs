@@ -93,5 +93,12 @@ namespace Framework.TetraGraphs
             // All nodes are the same
             return true;
         }
+
+        public override string ToString()
+        {
+            return "Face: " + Nodes[0].Vector.ToString() + ", " 
+                            + Nodes[1].Vector.ToString() + ", " 
+                            + Nodes[2].Vector.ToString();
+        }
     }
 }

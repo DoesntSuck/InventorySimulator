@@ -101,5 +101,13 @@ namespace Framework.TetraGraphs
             // Tetrahedrons are equal
             return true;
         }
+
+        public override string ToString()
+        {
+            return "Tetra: " + Nodes[0].Vector.ToString() + ", "
+                             + Nodes[1].Vector.ToString() + ", "
+                             + Nodes[2].Vector.ToString() + ", "
+                             + Nodes[3].Vector.ToString();
+        }
     }
 }
