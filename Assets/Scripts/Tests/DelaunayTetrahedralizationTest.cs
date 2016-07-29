@@ -51,6 +51,11 @@ public class DelaunayTetrahedralizationTest : MonoBehaviour
                     }
                 }
             }
+
+            foreach (GraphNode node in tetrahedralization.Graph.Nodes)
+            {
+                Gizmos.DrawSphere(node.Vector, 0.01f);
+            }
         }
     }
 
