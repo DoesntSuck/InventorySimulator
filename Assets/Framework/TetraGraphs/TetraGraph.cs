@@ -139,7 +139,6 @@ namespace Framework.TetraGraphs
         /// <summary>
         /// Removes the given face from this graph. Tetrahedrons that are connected to the face are also removed.
         /// </summary>
-        /// <param name="face"></param>
         public void RemoveFace(GraphFace face)
         {
             // Find and remove face from faces collection
@@ -189,8 +188,57 @@ namespace Framework.TetraGraphs
             Tetrahedrons.Remove(tetrahedron);
         }
 
+        /// <summary>
+        /// Iterate through all unique faces in a collection of tetrahedrons
+        /// </summary>
+        public static IEnumerable<GraphFace> UniquesFaces(ICollection<GraphTetrahedron> tetras)
+        {
+            // HashSet to track duplicates
+            HashSet<GraphFace> faces = new HashSet<GraphFace>();
+            foreach (GraphTetrahedron tetra in tetras)
+            {
+                // Iterate through all tetras faces
+                foreach (GraphFace face in tetra.Faces)
+                {
+                    // If hashSet does not contain the face...
+                    if (!faces.Contains(face))
+                    {
+                        // Add to the set
+                        faces.Add(face);
+                        yield return face;  // return the face
+                    }
+                }
+            }
+        }
+
+        public static void InsideOutsideFaces(out List<GraphFace> insideFaces, out List<GraphFace> outsideFaces, List<GraphTetrahedron> tetras)
+        {
+            insideFaces = new List<GraphFace>();
+            outsideFaces = new List<GraphFace>();
+
+            foreach (GraphTetrahedron tetra1 in tetras)
+            {
+                foreach (GraphFace face in tetra1.Faces)
+                {
+                    bool outside = true;
+                    foreach (GraphTetrahedron tetra2 in tetras.Where(t => t != tetra1))
+                    {
+                        if (tetra2.Contains(face))
+                        {
+                            insideFaces.Add(face);
+                            outside = false;
+                            break;
+                        }
+                    }
+
+                    // No tetra (other than tetra1) contains this face; therefore, it must be an outside face
+                    if (outside)
+                        outsideFaces.Add(face);
+                }
+            }
+        }
         // TODO: Inserting a face can create many tetrahdra
-        
+
         /// <summary>
         /// Checks if a tetrahedron has been formed with the addition of the given edge. If so, the tetrahedron is created and returned.
         /// </summary>
