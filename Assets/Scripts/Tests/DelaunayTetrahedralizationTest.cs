@@ -3,7 +3,6 @@ using System.Collections;
 using Framework;
 using Framework.TetraGraphs;
 
-
 public class DelaunayTetrahedralizationTest : MonoBehaviour
 {
 
@@ -14,6 +13,9 @@ public class DelaunayTetrahedralizationTest : MonoBehaviour
     public int nNodes = 10;
 
     private DelaunayTetrahedralization tetrahedralization;
+    private TetraGraph dualGraph;
+
+    public bool dual = false;
 
     void Start()
     {
@@ -35,44 +37,47 @@ public class DelaunayTetrahedralizationTest : MonoBehaviour
         // Give vectors to triangulation
         tetrahedralization = new DelaunayTetrahedralization();
         tetrahedralization.Insert(insertionVectors);
+
+        dualGraph = tetrahedralization.DualGraph();
+    }
+
+    void Update()
+    {
+        if (Input.GetMouseButtonDown(0))
+            dual = !dual;
     }
 
     void OnDrawGizmos()
     {
-        if (tetrahedralization != null)
+        if (dual)
         {
-            foreach (GraphTetrahedron tetra in tetrahedralization.Graph.Tetrahedrons)
-            {
-                for (int i = 0; i < tetra.Nodes.Length - 1; i++)
-                {
-                    for (int j = i + 1; j < tetra.Nodes.Length; j++)
-                    {
-                        Gizmos.DrawLine(tetra.Nodes[i].Vector, tetra.Nodes[j].Vector);
-                    }
-                }
-            }
+            if (dualGraph != null)
+                DrawTetraWithGizmos(dualGraph);
+        }
 
-            foreach (GraphNode node in tetrahedralization.Graph.Nodes)
-            {
-                Gizmos.DrawSphere(node.Vector, 0.01f);
-            }
+        else
+        {
+            if (tetrahedralization != null)
+                DrawTetraWithGizmos(tetrahedralization.Graph);
         }
     }
 
-    //private bool CheckDelaunay()
-    //{
-    //    foreach (GraphTriangle triangle in triangulation.Graph.Triangles)
-    //    {
-    //        foreach (GraphNode node in triangulation.Graph.Nodes)
-    //        {
-    //            if (!triangle.Contains(node))
-    //            {
-    //                if (triangle.InsideCircumsphere(node.Vector))
-    //                    return false;
-    //            }
-    //        }
-    //    }
+    private void DrawTetraWithGizmos(TetraGraph graph)
+    {
+        foreach (GraphTetrahedron tetra in graph.Tetrahedrons)
+        {
+            for (int i = 0; i < tetra.Nodes.Length - 1; i++)
+            {
+                for (int j = i + 1; j < tetra.Nodes.Length; j++)
+                {
+                    Gizmos.DrawLine(tetra.Nodes[i].Vector, tetra.Nodes[j].Vector);
+                }
+            }
+        }
 
-    //    return true;
-    //}
+        foreach (GraphNode node in graph.Nodes)
+        {
+            Gizmos.DrawSphere(node.Vector, 0.01f);
+        }
+    }
 }

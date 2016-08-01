@@ -88,6 +88,17 @@ namespace Framework.TetraGraphs
             return Faces.Contains(face);
         }
 
+        public bool SharesFace(GraphTetrahedron other)
+        {
+            foreach (GraphFace face in Faces)
+            {
+                if (other.Contains(face))
+                    return true;
+            }
+
+            return false;
+        }
+
         public bool Equals(GraphTetrahedron other)  
         {
             // Check each node for inclusion in other tetrahedron's nodes

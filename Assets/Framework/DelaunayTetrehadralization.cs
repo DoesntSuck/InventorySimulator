@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using Framework.TetraGraphs;
 
@@ -83,8 +82,6 @@ namespace Framework
                 GraphNode newNode = Graph.AddNode(insertionVector);
                 foreach (GraphFace outsideFace in outsideFaces)
                     Graph.AddFaces(outsideFace, newNode);
-
-                int TESTING_POTATO_TOMATO = 0;
             }
 
             //
@@ -93,6 +90,55 @@ namespace Framework
 
             foreach (GraphNode node in superTetra)
                 Graph.RemoveNode(node);
+        }
+
+        public TetraGraph DualGraph()
+        {
+            // each tetrahedron gets converted into a vector -> vector is located at tetra circumsphere centre
+
+            // For each tetra circumcenter, check for tetras that share a face, add edge between tetra circumcenters
+
+            // need to add faces not edges: foreach tetra find a tetra that shares an edge, then another that shares an edge with both, connect their circumcenters
+
+
+            // New graph
+            TetraGraph dualGraph = new TetraGraph();
+
+            // Create dict of tetra - nodes
+            Dictionary<GraphTetrahedron, GraphNode> dualGraphNodes = new Dictionary<GraphTetrahedron, GraphNode>();
+            foreach (GraphTetrahedron tetra in Graph.Tetrahedrons)
+            {
+                // Node position is circumsphere centre
+                Vector3 nodeVector = tetra.Circumsphere.Centre;
+
+                // New node
+                GraphNode node = dualGraph.AddNode(nodeVector);
+                
+                // Add to dict
+                dualGraphNodes.Add(tetra, node);
+            }
+
+            // Find tetras that form a dual graph triangle
+            foreach (GraphTetrahedron tetra1 in Graph.Tetrahedrons)
+            {
+                foreach (GraphTetrahedron tetra2 in Graph.Tetrahedrons)
+                {
+                    if (tetra1.SharesFace(tetra2))
+                    {
+                        foreach (GraphTetrahedron tetra3 in Graph.Tetrahedrons)
+                        {
+                            if (tetra3.SharesFace(tetra2) &&
+                                tetra3.SharesFace(tetra1))
+                            {
+                                // Get nodes from dict (tetra is key); insert face between the three
+                                dualGraph.AddFace(dualGraphNodes[tetra1], dualGraphNodes[tetra2], dualGraphNodes[tetra3]);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return dualGraph;
         }
     }
 }
