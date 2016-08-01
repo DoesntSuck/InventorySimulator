@@ -24,21 +24,13 @@ public class DelaunayTetrahedralizationTest : MonoBehaviour
 
         // Generate random position and create empty object at position
         for (int i = 0; i < insertionVectors.Length; i++)
-        {
-            // Random position
             insertionVectors[i] = Random.insideUnitSphere;
-
-            // New gameobj at position
-            GameObject nodeObj = new GameObject("Node");
-            nodeObj.transform.SetParent(transform);
-            nodeObj.transform.position = insertionVectors[i];
-        }
 
         // Give vectors to triangulation
         tetrahedralization = new DelaunayTetrahedralization();
         tetrahedralization.Insert(insertionVectors);
 
-        dualGraph = tetrahedralization.DualGraph();
+        dualGraph = tetrahedralization.Graph.DualGraph();
     }
 
     void Update()

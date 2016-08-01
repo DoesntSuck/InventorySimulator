@@ -189,6 +189,52 @@ namespace Framework.TetraGraphs
         }
 
         /// <summary>
+        /// Calculates the dual graph of this TetraGraph. The dual graph has a vertex for each tetrahedron in the original graph. Edges are created to
+        /// connect each vertex wherever their corresponding tetrahedron in the original graph shares a face.
+        /// </summary>
+        public TetraGraph DualGraph()
+        {
+            // New graph
+            TetraGraph dualGraph = new TetraGraph();
+
+            // Create dict of tetra - nodes
+            Dictionary<GraphTetrahedron, GraphNode> dualGraphNodes = new Dictionary<GraphTetrahedron, GraphNode>();
+            foreach (GraphTetrahedron tetra in Tetrahedrons)
+            {
+                // Node position is circumsphere centre
+                Vector3 nodeVector = tetra.Circumsphere.Centre;
+
+                // New node
+                GraphNode node = dualGraph.AddNode(nodeVector);
+
+                // Add to dict
+                dualGraphNodes.Add(tetra, node);
+            }
+
+            // Find tetras that form a dual graph triangle
+            foreach (GraphTetrahedron tetra1 in Tetrahedrons)
+            {
+                foreach (GraphTetrahedron tetra2 in Tetrahedrons)
+                {
+                    if (tetra1.SharesFace(tetra2))
+                    {
+                        foreach (GraphTetrahedron tetra3 in Tetrahedrons)
+                        {
+                            if (tetra3.SharesFace(tetra2) &&
+                                tetra3.SharesFace(tetra1))
+                            {
+                                // Get nodes from dict (tetra is key); insert face between the three
+                                dualGraph.AddFace(dualGraphNodes[tetra1], dualGraphNodes[tetra2], dualGraphNodes[tetra3]);
+                            }
+                        }
+                    }
+                }
+            }
+
+            return dualGraph;
+        }
+
+        /// <summary>
         /// Iterate through all unique faces in a collection of tetrahedrons
         /// </summary>
         public static IEnumerable<GraphFace> UniquesFaces(ICollection<GraphTetrahedron> tetras)
@@ -237,7 +283,6 @@ namespace Framework.TetraGraphs
                 }
             }
         }
-        // TODO: Inserting a face can create many tetrahdra
 
         /// <summary>
         /// Checks if a tetrahedron has been formed with the addition of the given edge. If so, the tetrahedron is created and returned.
