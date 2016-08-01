@@ -42,35 +42,54 @@ namespace UnityExtension
 
         public static Vector3 Circumcentre(Vector3 a, Vector3 b, Vector3 c, Vector3 d)
         {
-            // Edge vectors are also the normals of perpendicular planes because the normal of a plane is the vector that is perpendicular to the plane
-            // Plane point is the midpoint for the edge
-
             // Calculate plane for edge AB
-            Vector3 planeABNormal = b - a;                      
+            Vector3 planeABNormal = b - a;
             Vector3 planeABPoint = Vector3.Lerp(a, b, 0.5f);
 
             // Calculate plane for edge AC
             Vector3 planeACNormal = c - a;
             Vector3 planeACPoint = Vector3.Lerp(a, c, 0.5f);
 
+            // Calculate plane for edge BD
+            Vector3 planeBDNormal = d - b;
+            Vector3 planeBDPoint = Vector3.Lerp(b, d, 0.5f);
+
             // Calculate plane for edge CD
             Vector3 planeCDNormal = d - c;
             Vector3 planeCDPoint = Vector3.Lerp(c, d, 0.5f);
 
             // Calculate line that is the plane-plane intersection between AB and AC
-            Vector3 linePoint;
-            Vector3 lineDirection;
+            Vector3 linePoint1;
+            Vector3 lineDirection1;
 
-            PlanePlaneIntersection(out linePoint, out lineDirection, planeABNormal, planeABPoint, planeACNormal, planeACPoint);
+            // Taken from: http://wiki.unity3d.com/index.php/3d_Math_functions
+            PlanePlaneIntersection(out linePoint1, out lineDirection1, planeABNormal, planeABPoint, planeACNormal, planeACPoint);
+
+            Vector3 linePoint2;
+            Vector3 lineDirection2;
+
+            PlanePlaneIntersection(out linePoint2, out lineDirection2, planeBDNormal, planeBDPoint, planeCDNormal, planeCDPoint);
 
             // Calculate the point that is the plane-line intersection between the above line and CD
             Vector3 intersection;
 
-            LinePlaneIntersection(out intersection, linePoint, lineDirection, planeCDNormal, planeCDPoint);
+            // Floating point inaccuracy often causes these two lines to not intersect, in that case get the two closest points on each line 
+            // and average them
+            // Taken from: http://wiki.unity3d.com/index.php/3d_Math_functions
+            if (!LineLineIntersection(out intersection, linePoint1, lineDirection1, linePoint2, lineDirection2))
+            {
+                Vector3 closestLine1;
+                Vector3 closestLine2;
+
+                // Taken from: http://wiki.unity3d.com/index.php/3d_Math_functions
+                ClosestPointsOnTwoLines(out closestLine1, out closestLine2, linePoint1, lineDirection1, linePoint2, lineDirection2);
+
+                // Intersection is halfway between the closest two points on lines
+                intersection = Vector3.Lerp(closestLine2, closestLine2, 0.5f);
+            }
 
             return intersection;
         }
-
 
 
         /* http://mathforum.org/kb/message.jspa?messageID=4602531
@@ -221,13 +240,6 @@ namespace UnityExtension
                 return false;
             }
         }
-
-
-
-
-        // TODO: Plane requires point and normal. Point is midpoint of edge, normal is the vector from edge point a to edge point b.
-
-
 
         //Find the line of intersection between two planes.	The planes are defined by a normal and a point on that plane.
         //The outputs are a point on the line and a vector which indicates it's direction. If the planes are not parallel, 

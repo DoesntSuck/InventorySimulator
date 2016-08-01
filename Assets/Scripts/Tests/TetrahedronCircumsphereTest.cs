@@ -16,7 +16,7 @@ namespace InventorySimulator
             for (int i = 0; i < 4; i++)
                 vectors[i] = transform.GetChild(i).position;
 
-            // Calculate circumsphere in memory
+            // Calculate circumsphere
             Sphere circumsphere = Sphere.Circumsphere(vectors[0], vectors[1], vectors[2], vectors[3]);
 
             // Instantiate sphere game object, position at circumcentre, size to circumradius
